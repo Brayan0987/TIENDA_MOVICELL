@@ -1,0 +1,196 @@
+body {
+    background: var(--gradient-dark, linear-gradient(135deg, #23272a 0%, #1a1a1a 100%));
+    color: var(--gray-100);
+    font-family: 'Inter', 'Roboto', sans-serif;
+    padding-top: 60px;
+    min-height: 100vh;
+}
+
+.contenerdor {
+    max-width: 1400px;
+    margin: 32px auto;
+    padding: 18px 22px;
+    background: rgba(32,34,36, .92);
+    border-radius: var(--radius-xl, 1.5rem);
+    box-shadow: var(--shadow-lg, 0 10px 15px -3px rgb(0 0 0 / 0.1));
+}
+
+.contenerdor h1 {
+    text-align: center;
+    color: var(--white);
+    font-size: 2.1rem;
+    margin-bottom: 24px;
+    font-weight: 900;
+    border-bottom: 2px solid var(--accent, #00BFA6);
+    padding-bottom: 10px;
+    display: inline-block;
+    letter-spacing: 1px;
+}
+
+.search-container form {
+    display: flex;
+    gap: 12px;
+    background: rgba(40,42,45,1);
+    border-radius: var(--radius-lg, 1rem);
+    padding: 10px 13px;
+    box-shadow: var(--shadow-sm, 0 1px 2px 0 rgb(0 0 0 / 0.05));
+}
+
+.search-container .form_control {
+    flex: 1;
+    margin: 0;
+    border: 1.5px solid var(--accent, #00BFA6);
+    background: var(--gray-800, #262626);
+    color: var(--gray-100, #E0E0E0);
+    border-radius: var(--radius-md, 0.75rem);
+}
+
+.btn-buscar {
+    background: var(--accent, #00BFA6);
+    color: var(--dark, #000);
+    font-weight: 700;
+    border: none;
+    border-radius: var(--radius-md, 0.75rem);
+    padding: 0 26px;
+    font-size: 15px;
+    transition: background .28s;
+    box-shadow: 0 3px 8px rgba(0,191,166,.085);
+}
+.btn-buscar:hover {
+    background: #009e89;
+}
+
+.mensaje-exito {
+    color: var(--success, #00ff00); 
+    font-weight: bold; 
+    margin-bottom: 18px; 
+    text-align:center;
+    background: rgba(0,255,0,0.1);
+    padding: 10px;
+    border-radius: var(--radius-lg, 1rem);
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
+    justify-content: center;
+}
+
+.ingreso_datos {
+    background: rgba(34,36,40,1);
+    padding: 24px;
+    border-radius: var(--radius-lg, 1rem);
+    box-shadow: 0 8px 32px rgba(20,20,20,0.16);
+    border: 1.5px solid var(--gray-700, #404040);
+
+    flex-grow: 1;
+    flex-basis: 320px;
+    min-width: 260px;
+    max-width: 400px;
+}
+
+.ingreso_datos h2 {
+    color: var(--white, #fff);
+    font-size: 1.3rem;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--accent, #00BFA6);
+    padding-bottom: 7px;
+}
+
+.ingreso_datos form {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+}
+
+.form_control {
+    width: 100%;
+    padding: 12px 14px;
+    background: var(--gray-900, #171717);
+    border: 1px solid var(--gray-700, #404040);
+    border-radius: var(--radius-md, 0.75rem);
+    color: var(--gray-50, #fafafa);
+    font-size: 16px;
+    transition: border-color .21s, box-shadow .21s;
+}
+.form_control:focus {
+    outline: none;
+    border-color: var(--accent, #00BFA6);
+    box-shadow: 0 0 0 3px rgba(0, 191, 166, 0.18);
+}
+
+.btn-submit {
+    background: var(--accent, #00BFA6);
+    color: var(--dark, #000);
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .27s;
+    font-size: 16px;
+    margin-top: 6px;
+    border-radius: var(--radius-md, 0.75rem);
+    border: none;
+}
+.btn-submit:hover {
+    background: #009e89;
+}
+
+.lista-titulo {
+    margin-top: 2.2rem;
+    color: var(--gray-50, #E0E0E0);
+    border-top: 1px solid var(--gray-600, #525252);
+    padding-top: 16px;
+    font-weight: 500;
+    font-size: 1.08rem;
+}
+
+.lista-items {
+    list-style: none;
+    padding: 0;
+    margin-top: 13px;
+    max-height: 290px;
+    overflow-y: auto;
+}
+
+.lista-items li {
+    color: var(--gray-50, #E0E0E0);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border-radius: var(--radius-md, 0.75rem);
+    transition: background 0.22s;
+    margin-bottom: 6px;
+    background: var(--gray-800, #262626);
+}
+.lista-items li:hover {
+    background: var(--gray-700, #404040);
+}
+
+.lista-items li span {
+    font-size: 1.07rem;
+    word-break: break-all;
+    font-weight: 500;
+}
+
+.btn-eliminar {
+    color: #FF6B6B;
+    font-weight: bold;
+    text-decoration: none;
+    background: #3c2a2a;
+    border: 1.3px solid #FF6B6B;
+    border-radius: 7px;
+    padding: 5px 13px;
+    margin-left: 10px;
+    font-size: .92rem;
+    transition: background .22s, color .22s;
+}
+.btn-eliminar:hover {
+    background: #FF6B6B;
+    color: #fff;
+}
+
+@media (max-width: 900px) {
+    .contenerdor { padding: 7px 1vw; }
+    .row { gap: 13px; }
+}

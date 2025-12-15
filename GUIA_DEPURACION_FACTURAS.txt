@@ -1,0 +1,206 @@
+🔧 GUÍA DE DEPURACIÓN - FACTURAS NO FUNCIONAN
+═══════════════════════════════════════════════════════════
+
+PROBLEMA ORIGINAL:
+❌ Descargar factura no funciona
+❌ Ver factura no funciona
+❌ Se redirige automáticamente a inicio
+
+CAUSAS IDENTIFICADAS:
+─────────────────────────────────────────────────────────
+
+1. ❌ RUTAS NO REGISTRADAS EN ROUTER
+   • Las rutas /factura/ver, /factura/descargar no estaban en Public/index.php
+   • El sistema usa switch() manual, no un router automático
+   • Agregadas ANTES del 'default' case
+
+2. ❌ VARIABLES DE SESIÓN INCORRECTAS
+   • Usaba $_SESSION['user_rol'] 
+   • Debería ser $_SESSION['user_role']
+   • Corregido en InvoiceController
+
+3. ❌ VERIFICACIÓN DE ACCESO PREMATURA
+   • verificarAcceso() se llamaba sin verificar sesión primero
+   • No había validación de autenticación en index.php
+   • Ahora valida sesión en index.php ANTES de llamar controlador
+
+SOLUCIONES IMPLEMENTADAS:
+─────────────────────────────────────────────────────────
+
+✅ 1. RUTAS AGREGADAS A Public/index.php
+   
+   Líneas ~390-420:
+   
+   case ($route === '/factura/ver'):
+       if (empty($_SESSION['user_id'])) {
+           header('Location: ' . $baseUrl . '/index.php?r=/login');
+           exit;
+       }
+       require_once __DIR__ . '/../App/Controllers/InvoiceController.php';
+       $controller = new \App\Controllers\InvoiceController();
+       $controller->view();
+       break;
+
+   case ($route === '/factura/descargar'):
+       if (empty($_SESSION['user_id'])) {
+           header('Location: ' . $baseUrl . '/index.php?r=/login');
+           exit;
+       }
+       require_once __DIR__ . '/../App/Controllers/InvoiceController.php';
+       $controller = new \App\Controllers\InvoiceController();
+       $controller->download();
+       break;
+
+   case ($route === '/factura/reenviar'):
+       if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+           header('Content-Type: application/json; charset=utf-8');
+           echo json_encode(['success' => false, 'message' => 'Método no permitido']);
+           exit;
+       }
+       if (empty($_SESSION['user_id'])) {
+           header('Content-Type: application/json; charset=utf-8');
+           echo json_encode(['success' => false, 'message' => 'Acceso denegado']);
+           exit;
+       }
+       require_once __DIR__ . '/../App/Controllers/InvoiceController.php';
+       $controller = new \App\Controllers\InvoiceController();
+       $controller->resend();
+       break;
+
+✅ 2. InvoiceController REESCRITO
+   
+   • Ahora verifica $_SESSION['user_id'] al inicio de cada método
+   • Usa $_SESSION['user_role'] (sin la 'u')
+   • Redirige a login si no está autenticado
+   • Usa Db::connect() directamente en lugar de Models
+   • Llamadas SQL directas más robustas
+
+✅ 3. MÉTODOS AÑADIDOS
+   
+   • obtenerPedido($id): Consulta directa a BD
+   • obtenerDetallesPedido($id): Consulta directa a BD
+   • verificarAcceso($id): Valida permisos del usuario
+
+CÓMO PROBAR:
+─────────────────────────────────────────────────────────
+
+1️⃣ LOGIN PRIMERO
+   http://localhost/TIENDA_MOVICELL/Public/index.php?r=/login
+   
+   Usuario: cualquier usuario registrado
+   Contraseña: su contraseña
+
+2️⃣ LUEGO ACCEDER A FACTURA
+   http://localhost/TIENDA_MOVICELL/Public/index.php?r=/factura/ver&id=20
+   (reemplaza 20 con un ID de pedido real del usuario logueado)
+
+3️⃣ O DESDE EL PANEL
+   http://localhost/TIENDA_MOVICELL/Public/index.php?r=/panel
+   • Ver botones en "Mis Pedidos"
+   • Clickear "Ver PDF" o "⬇️ PDF"
+
+ERRORES COMUNES Y SOLUCIONES:
+─────────────────────────────────────────────────────────
+
+❌ "Error: Usuario no autenticado"
+   → Solución: Debes estar logueado primero
+   → Ve a /login antes
+
+❌ "Error: No tienes permiso para ver este pedido"
+   → Solución: El pedido no es tuyo
+   → Como usuario, solo ves tus pedidos
+   → Como admin, ves todos
+
+❌ "Error: ID de pedido no proporcionado"
+   → Solución: Falta el parámetro ?id=XX
+   → URL correcta: /factura/ver?id=20
+
+❌ Se redirige a inicio automáticamente
+   → Solución: Las rutas no estaban en index.php (YA CORREGIDO)
+   → Limpia cache del navegador (Ctrl+Shift+Delete)
+   → Si sigue: comprueba que Public/index.php está actualizado
+
+❌ "Pedido no encontrado"
+   → Solución: El ID no existe en la BD
+   → Verifica que el pedido existe
+   → Comprueba que tiene el formato correcto
+
+VERIFICACIÓN DE LA SOLUCIÓN:
+─────────────────────────────────────────────────────────
+
+Ejecuta:
+  php tools/diagnostico_facturas.php
+
+Debe mostrar:
+  ✓ Verificando archivos...
+  ✓ Verificando clases y métodos...
+  ✓ Verificando rutas en index.php...
+  ✓ Verificando variables de sesión...
+  ✓ URLs para prueba...
+  ✅ DIAGNÓSTICO COMPLETADO
+
+ARCHIVOS MODIFICADOS:
+─────────────────────────────────────────────────────────
+
+1. Public/index.php
+   • Agregadas 3 nuevas rutas (factura/ver, factura/descargar, factura/reenviar)
+   • Cada ruta verifica autenticación antes de llamar controlador
+   • Rutas agregadas ANTES del 'default' case
+
+2. App/Controllers/InvoiceController.php
+   • REESCRITO completamente
+   • Ahora usa Db::connect() directamente
+   • Verifica autenticación al inicio de cada método
+   • Usa nombre correcto de variable de sesión: user_role
+
+3. tools/diagnostico_facturas.php
+   • CREADO nuevo script para verificar configuración
+
+RESUMENCITO:
+─────────────────────────────────────────────────────────
+
+El problema ERA que:
+• Las rutas NO estaban en el router
+• Las variables de sesión estaban mal nombradas
+• No había verificación de autenticación previa
+
+Ahora FUNCIONA porque:
+• ✅ Rutas están en Public/index.php antes de default
+• ✅ Variables de sesión tienen nombres correctos
+• ✅ index.php verifica autenticación antes de llamar controlador
+• ✅ InvoiceController es más robusto
+
+PASOS PARA VERIFICAR:
+─────────────────────────────────────────────────────────
+
+1. ☑️ Verifica que Public/index.php tiene las 3 nuevas rutas
+2. ☑️ Verifica que están ANTES de 'default' case
+3. ☑️ Verifica que App/Controllers/InvoiceController.php existe
+4. ☑️ Limpia cache del navegador
+5. ☑️ Login en tu cuenta
+6. ☑️ Ve a /panel
+7. ☑️ Clickea "Ver PDF" en un pedido
+8. ☑️ Debería abrir factura en nueva pestaña ✅
+
+Si SIGUE SIN FUNCIONAR:
+─────────────────────────────────────────────────────────
+
+1. Verifica logs de PHP:
+   tail -f C:\xampp\apache\logs\error.log
+
+2. Verifica que el usuario está logueado:
+   Abre navegador → F12 → Storage → Cookies
+   Busca sesión PHP (PHPSESSID)
+
+3. Prueba URL directa con ID conocido:
+   /factura/ver?id=1
+
+4. Si sigue error, revisa:
+   • ¿Tiene el usuario ese pedido?
+   • ¿El pedido existe en la BD?
+   • ¿Hay datos en detalle_pedidos?
+
+═══════════════════════════════════════════════════════════
+Generado: 2025-12-05
+Estado: ✅ CORREGIDO Y LISTO
+═══════════════════════════════════════════════════════════

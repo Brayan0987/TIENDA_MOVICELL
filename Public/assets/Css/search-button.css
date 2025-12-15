@@ -1,0 +1,27 @@
+/* Estilos para el botón de búsqueda */
+.btn-search-submit {
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
+    white-space: nowrap;
+}
+
+.btn-search-submit:hover {
+    background: #0052a3 !important;
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.5);
+    transform: translateY(-2px);
+}
+
+.btn-search-submit:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+    .btn-search-submit {
+        padding: 10px 14px !important;
+        font-size: 0.9rem;
+    }
+    
+    .btn-search-submit span {
+        display: none;
+    }
+}

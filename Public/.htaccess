@@ -1,0 +1,9 @@
+RewriteEngine On
+RewriteBase /TIENDA_MOVICELL/public/
+
+# No reescribir archivos reales (CSS, JS, imágenes)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Capturar la ruta y pasarla como parámetro
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
